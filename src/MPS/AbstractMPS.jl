@@ -37,7 +37,7 @@ dim(psi::AbstractMPS) = psi.d
 
 The orthogonal center of an MPS or MPO. Returns 0 if not set.
 """
-center(psi::AbstractMPS) = psi.center
+centre(psi::AbstractMPS) = psi.centre
 
 
 """

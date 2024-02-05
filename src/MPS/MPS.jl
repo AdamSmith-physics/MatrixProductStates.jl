@@ -6,7 +6,7 @@ mutable struct MPS <: AbstractMPS
     N::Int  # number of sites
 
     tensors::Vector{Array{ComplexF64,3}}  # tensors (vl, p, vr)
-    center::Int # center site in [1, N]
+    centre::Int # centre site in [1, N]
 
     chiMax::Int  # maximum bond dimension (0 for unbounded)
     threshold::Float64  # truncation threshold (0.0 for no truncation)
