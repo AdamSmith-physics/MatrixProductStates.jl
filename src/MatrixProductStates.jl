@@ -1,5 +1,6 @@
 module MatrixProductStates
 
+using TensorOperations
 using LinearAlgebra: norm, svd
 
 include("contract.jl")
