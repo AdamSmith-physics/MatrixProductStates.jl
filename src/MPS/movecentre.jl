@@ -2,7 +2,7 @@
 
 function moveright!(mps::MPS)
     if centre(mps) < length(mps) && centre(mps) >= 1
-        A, S, B = svd(mps.tensors[mps.centre], 3)  # exact SVD
+        A, S, B = svd_tensor(mps.tensors[mps.centre], 3)  # exact SVD
 
         mps.tensors[mps.centre] = A
         B = Diagonal(S) * B
@@ -13,7 +13,7 @@ end
 
 function moveleft!(mps::MPS)
     if centre(mps) > 1 && centre(mps) <= length(mps)
-        A, S, B = svd(mps.tensors[mps.centre], 1)  # exact SVD
+        A, S, B = svd_tensor(mps.tensors[mps.centre], 1)  # exact SVD
 
         mps.tensors[mps.centre] = B
         A = A * Diagonal(S)

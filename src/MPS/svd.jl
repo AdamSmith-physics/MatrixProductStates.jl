@@ -1,7 +1,7 @@
 
 """ trucated matrix SVD
 """
-function svd(A::Array{ComplexF64,2}, chiMax::Int, threshold::Float64)
+function svd_truncated(A::Array{ComplexF64,2}, chiMax::Int, threshold::Float64)
     local F
     try
         F = svd(A, alg=LinearAlgebra.DivideAndConquer())
@@ -17,7 +17,7 @@ function svd(A::Array{ComplexF64,2}, chiMax::Int, threshold::Float64)
         
         U = U[:, 1:chi]
         S = S[1:chi]
-        S = S ./ norm(S)
+        S = S ./ norm(S)  # add flag to decide when to normalize!
         Vt = Vt[1:chi, :]
     end
 
@@ -26,7 +26,7 @@ end
 
 """ trucated tensor SVD along a specified index  (1 or 3)
 """
-function svd(C::Array{ComplexF64,3}, idx::Int, chiMax::Int=0, threshold::Float64=0.0)
+function svd_tensor(C::Array{ComplexF64,3}, idx::Int, chiMax::Int=0, threshold::Float64=0.0)
     sizeC = size(C)
     if idx == 1
         D = reshape(C, (sizeC[1],sizeC[2]*sizeC[3]))
@@ -35,7 +35,7 @@ function svd(C::Array{ComplexF64,3}, idx::Int, chiMax::Int=0, threshold::Float64
     else
         throw(ArgumentError("Invalid index for SVD."))
     end
-    A, S, B = svd(D, chiMax, threshold)
+    A, S, B = svd_truncated(D, chiMax, threshold)
     if idx == 1
         B = reshape(B, (size(B,1), sizeC[2], sizeC[3]))
     elseif idx == 3
