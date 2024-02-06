@@ -9,6 +9,7 @@ psi[1]
 MatrixProductStates.moveright!(psi)
 println(psi)
 MatrixProductStates.moveleft!(psi)
+println(psi)
 
 MatrixProductStates.movecentre(psi, 5)
 println(psi)
