@@ -76,7 +76,8 @@ end
 function Base.show(io::IO, M::AbstractMPS)
     println(io, "$(typeof(M))")
     for i = 1:length(M)
-        println(io, "[$(i)] $(size(M[i]))")
+        asterisk = i == M.centre ? "*" : ""
+        println(io, "[$(i)$(asterisk)] $(size(M[i]))")
     end
 end
 

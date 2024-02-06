@@ -37,7 +37,7 @@ function svd(C::Array{ComplexF64,3}, idx::Int, chiMax::Int=0, threshold::Float64
     end
     A, S, B = svd(D, chiMax, threshold)
     if idx == 1
-        B = reshape(A, (size(B,1), sizeC[2], sizeC[3]))
+        B = reshape(B, (size(B,1), sizeC[2], sizeC[3]))
     elseif idx == 3
         A = reshape(A, (sizeC[1], sizeC[2], size(A,2)))
     end
