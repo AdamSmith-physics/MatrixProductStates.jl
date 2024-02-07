@@ -1,8 +1,8 @@
 
 
-function moveright!(mps::MPS)
+function moveright!(mps::MPS; normalised::Bool=false)
     if centre(mps) < length(mps) && centre(mps) >= 1
-        A, S, B = svd_tensor(mps.tensors[mps.centre], 3)  # exact SVD
+        A, S, B = svd_tensor(mps.tensors[mps.centre], 3; normalised=normalised)  # exact SVD
 
         mps.tensors[mps.centre] = A
         B = Diagonal(S) * B
@@ -11,9 +11,9 @@ function moveright!(mps::MPS)
     end
 end
 
-function moveleft!(mps::MPS)
+function moveleft!(mps::MPS; normalised::Bool=false)
     if centre(mps) > 1 && centre(mps) <= length(mps)
-        A, S, B = svd_tensor(mps.tensors[mps.centre], 1)  # exact SVD
+        A, S, B = svd_tensor(mps.tensors[mps.centre], 1; normalised=normalised)  # exact SVD
 
         mps.tensors[mps.centre] = B
         A = A * Diagonal(S)
@@ -22,15 +22,15 @@ function moveleft!(mps::MPS)
     end
 end
 
-function movecentre(mps::MPS, site::Int)
+function movecentre(mps::MPS, site::Int; normalised::Bool=false)
     if site < 1 || site > length(mps)
         throw(ArgumentError("Invalid site for center."))
     end
 
     while centre(mps) < site
-        moveright!(mps)
+        moveright!(mps; normalised=normalised)
     end
     while centre(mps) > site
-        moveleft!(mps)
+        moveleft!(mps; normalised=normalised)
     end
 end
