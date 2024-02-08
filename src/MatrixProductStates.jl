@@ -12,6 +12,7 @@ include("MPS/svd.jl")
 include("MPS/movecentre.jl")
 include("MPS/normalise.jl")
 include("MPS/overlap.jl")
+include("MPS/expectation.jl")
 
 end # module MatrixProductStates
 ``

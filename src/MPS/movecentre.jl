@@ -22,7 +22,7 @@ function moveleft!(mps::MPS; normalised::Bool=false)
     end
 end
 
-function movecentre(mps::MPS, site::Int; normalised::Bool=false)
+function movecentre!(mps::MPS, site::Int; normalised::Bool=false)
     if site < 1 || site > length(mps)
         throw(ArgumentError("Invalid site for center."))
     end
