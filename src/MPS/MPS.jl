@@ -42,3 +42,12 @@ function randomMPS(N::Int, d::Int, chi::Int, chiMax::Int, threshold::Float64)
     MPS(d, N, tensors, 1, chiMax, threshold)
 end
 
+
+
+"""
+Contract and flatten the MPS into a vector.
+"""
+function flatten(mps::MPS)
+    return nothing
+end
+

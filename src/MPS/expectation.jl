@@ -39,3 +39,30 @@ function expectation_2site(mps::MPS, O::Array{<:Number,2}, site::Int)
 
     return out[1]  # return as number instead of zero dimensional array
 end
+
+export energy_TFIM
+function energy_TFIM(mps::MPS, J::Real, h::Real)
+    """
+    Calculate the energy of the transverse field Ising model with nearest neighbour coupling J and transverse field h.
+    H = J * sum_i (X_i X_{i+1}) + h * sum_i Z_i
+    """
+    N = length(mps)
+    X = [0 1; 1 0]
+    Z = [1 0; 0 -1]
+    I = [1 0; 0 1]
+
+    H_local = zeros(ComplexF64, 4, 4)
+
+    H_local += J * kron(X,X)
+    H_local += h/2 * kron(Z, I) + h/2 * kron(I, Z)  # need to add extra at the ends
+
+    E = 0.0
+    for i in 1:N-1
+        E += expectation_2site(mps, H_local, i)
+    end
+
+    E += h/2 * expectation_1site(mps, Z, 1)  # extra at the ends
+    E += h/2 * expectation_1site(mps, Z, N)
+
+    return E
+end
