@@ -2,10 +2,12 @@ using Revise
 using MatrixProductStates
 using BenchmarkTools
 
-psi = MPS(10)
+psi = MPS(6)
 
 println(psi)
 psi[1]
+
+flatten(psi)  # I should write some tests to check (anit-)lexicographic ordering
 
 MatrixProductStates.moveright!(psi)
 println(psi)

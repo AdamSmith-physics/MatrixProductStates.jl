@@ -43,11 +43,21 @@ function randomMPS(N::Int, d::Int, chi::Int, chiMax::Int, threshold::Float64)
 end
 
 
-
+export flatten
 """
 Contract and flatten the MPS into a vector.
 """
 function flatten(mps::MPS)
-    return nothing
+
+    # contract the MPS into a single tensor
+    tensor = ones(ComplexF64, 1, 1)
+    for i in 1:mps.N
+        tensor = contract(tensor, mps.tensors[i], 2, 1)  # p1, p2, vr
+        tensor = reshape(tensor, size(tensor, 1)*size(tensor, 2), size(tensor, 3))  # (p1*p2), vr
+    end
+
+    tensor = reshape(tensor, size(tensor, 1))  # (p1*p2)*vr  # will fail if the end tensor doesn't have dangling index with dim 1
+
+    return tensor
 end
 
