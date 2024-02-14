@@ -37,7 +37,7 @@ dim(psi::AbstractMPS) = psi.d
 
 The orthogonal center of an MPS or MPO. Returns 0 if not set.
 """
-center(psi::AbstractMPS) = psi.center
+centre(psi::AbstractMPS) = psi.centre
 
 
 """
@@ -76,7 +76,8 @@ end
 function Base.show(io::IO, M::AbstractMPS)
     println(io, "$(typeof(M))")
     for i = 1:length(M)
-        println(io, "[$(i)] $(size(M[i]))")
+        asterisk = i == M.centre ? "*" : ""
+        println(io, "[$(i)$(asterisk)] $(size(M[i]))")
     end
 end
 
