@@ -17,8 +17,6 @@ function svd_truncated(A::Array{ComplexF64,2}, chiMax::Int, threshold::Float64; 
             chi = min(chiMax, chi)
         end
         if threshold != 0.0
-            println(cumsum(S.^2)/sum(S.^2))
-            println(sum(cumsum(S.^2)/sum(S.^2) .<= 1-threshold))
             chi = min(chi, sum(cumsum(S.^2)/sum(S.^2) .<= 1-threshold)+1)
         end
         
