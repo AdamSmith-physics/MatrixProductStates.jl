@@ -26,16 +26,23 @@ function apply_2site!(mps::MPS, O::Array{<:Number,2}, site::Int; normalised::Boo
         movecentre!(mps, site+1)
     end
 
+    O_swapped = reshape(O, (2,2,2,2))
+    O_swapped = permutedims(O_swapped, (2,1,4,3))
+    O_swapped = reshape(O_swapped, (4,4))
+
     A = copy(mps.tensors[site])  # vl, p, vr
     B = copy(mps.tensors[site+1])  # vl, p, vr
     C = contract(A, B, 3, 1)  # vl, p, p, vr
     C = reshape(C, (size(C,1), size(C,2)*size(C,3), size(C,4)))  # vl, p*p, vr
-    C = contract(O, C, 2, 2)  # p, vl, vr
+    C = contract(O_swapped, C, 2, 2)  # p, vl, vr
     C = permutedims(C, (2,1,3))
-    C = reshape(C, (size(C,1)*mps.dim, mps.dim*size(C,3)))
+    vl = size(C,1)
+    vr = size(C,3)
+    C = reshape(C, (size(C,1)*mps.d, mps.d*size(C,3)))
 
-    A, S, B = svd_truncated(C, mps.chiMax, mps.threshold, normalised=normalised)
-    A = A * diag(S)
-    mps.tensors[site] = reshape(A, (size(C,1),mps.dim,size(A,2)))
-    mps.tensors[site+1] = reshape(B, (size(B,1),mps.dim,size(C,3)))
+    A, S, B = svd_truncated(C, mps.chiMax, mps.threshold; normalised=normalised)
+    A = A * diagm(S)
+
+    mps.tensors[site] = reshape(A, (vl,mps.d,size(A,2)))
+    mps.tensors[site+1] = reshape(B, (size(B,1),mps.d,vr))
 end
