@@ -60,9 +60,9 @@ end
 
 M = randn(ComplexF64, 4, 4)
 
-psi = MPS(4)
-psi.chiMax = 4
-psi.threshold = 1e-10
+psi = MPS(2)
+#psi.chiMax = 4
+#psi.threshold = 1e-10
 psi_flat = flatten(psi)
 apply_2site!(psi, M, 1, normalised=false)
 println(psi)
