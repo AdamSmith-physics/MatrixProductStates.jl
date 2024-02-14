@@ -1,3 +1,5 @@
+export truncate!
+
 """
 Change the chiMax and threshold of an MPS and truncate it by sweeping through the MPS from left to right and right to left.
 """
