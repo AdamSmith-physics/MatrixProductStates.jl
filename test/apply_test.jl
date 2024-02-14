@@ -1,6 +1,7 @@
 using Revise
 using TestItems
 using MatrixProductStates
+using LinearAlgebra
 
 @testitem "Test apply 1-site" begin
     
@@ -53,3 +54,20 @@ end
     @test isapprox(flatten(psi), check_state, atol=1e-14)
 
 end
+
+
+#@testitem "Test apply 2-site random" begin
+
+M = randn(ComplexF64, 4, 4)
+
+psi = MPS(4)
+psi.chiMax = 4
+psi.threshold = 1e-10
+psi_flat = flatten(psi)
+apply_2site!(psi, M, 1, normalised=false)
+println(psi)
+flatten(psi)
+M*psi_flat
+
+
+#end
