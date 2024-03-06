@@ -6,6 +6,10 @@ import LinearAlgebra: norm, svd
 
 include("contract.jl")
 
+include("MPO/AbstractMPO.jl")
+include("MPO/MPO.jl")
+include("MPO/Hamiltonians.jl")
+
 include("MPS/AbstractMPS.jl")
 include("MPS/MPS.jl")
 include("MPS/svd.jl")
