@@ -1,6 +1,7 @@
 using LoopVectorization
 using Strided
 using TensorOperations
+using Tullio
 
 export expectation_1site
 function expectation_1site(mps::MPS, O::Array{<:Number,2}, site::Int)
@@ -51,8 +52,9 @@ export expectation
     N = length(mps)
     N == length(O) || throw(ArgumentError("MPS and MPO must have the same length."))
 
-    #matrices::Vector{Matrix{ComplexF64}} = [ones(ComplexF64,1,1) for _ in 1:N]
+    matrices::Vector{Matrix{ComplexF64}} = [ones(ComplexF64,1,1) for _ in 1:N]
 
+    """
     out = 1
     perm(x) = permutedims(x, (1,3,5,2,4,6))
     for i in 1:N
@@ -66,14 +68,18 @@ export expectation
         matrix = reshape(temp, (s_temp[1]*s_temp[2]*s_temp[3], s_temp[4]*s_temp[5]*s_temp[6]))
         out = out * matrix
     end
+    """
 
     
-    """Threads.@threads for i in 1:N
+    Threads.@threads for i in 1:N
         A = zeros(ComplexF64, size(O[i],1), size(O[i],2), size(O[i],4), size(mps[i],1), size(mps[i],3))
         temp = zeros(ComplexF64, size(mps[i],1), size(O[i],1), size(mps[i],1), size(mps[i],3), size(O[i],4), size(mps[i],3))
         
-        @tensor A[Ol, Op, Or, ml, mr] = O[i][Ol, Op, p2, Or] * mps[i][ml, p2, mr]
-        @tensor temp[ml_c, Ol, ml, mr_c, Or, mr] = conj(mps[i])[ml_c, p, mr_c] * A[Ol, p, Or, ml, mr]
+        O_local = copy(O[i])
+        mps_local = copy(mps[i])
+
+        @tullio A[Ol, Op, Or, ml, mr] = O_local[Ol, Op, p2, Or] * mps_local[ml, p2, mr]
+        @tullio temp[ml_c, Ol, ml, mr_c, Or, mr] = conj(mps_local[ml_c, p, mr_c]) * A[Ol, p, Or, ml, mr]
 
         #temp = zeros(ComplexF64, size(mps[i],1), size(O[i],1), size(mps[i],1), size(mps[i],3), size(O[i],4), size(mps[i],3))
         #@tensor begin
@@ -81,14 +87,14 @@ export expectation
         #end
         s_temp = size(temp)
         matrices[i] = reshape(temp, (s_temp[1]*s_temp[2]*s_temp[3], s_temp[4]*s_temp[5]*s_temp[6]))
-    end"""
+    end
     
 
     """out = 1.0
     for i in 1:N
         out = out * matrices[i]
     end"""
-    #out = prod(matrices)
+    out = prod(matrices)
 
 
     return out[1]  # return as number instead of zero dimensional array

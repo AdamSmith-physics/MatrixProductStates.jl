@@ -61,12 +61,12 @@ using Strided
 
 end
 
-N = 100
+N = 20
 J = rand()
 g = rand()
 h = rand()
 
-psi = randomMPS(N, 2, 4, 0, 0.0)
+psi = randomMPS(N, 2, 20, 0, 0.0)
 normalise!(psi)
 psi
 
