@@ -44,41 +44,51 @@ function expectation_2site(mps::MPS, O::Array{<:Number,2}, site::Int)
 end
 
 export expectation
-function expectation(mps::MPS, O::MPO)
+@inline function expectation(mps::MPS, O::MPO)
     """
     Calculate the expectation value of the MPO O acting on the MPS.
     """
     N = length(mps)
     N == length(O) || throw(ArgumentError("MPS and MPO must have the same length."))
 
-    matrices::Vector{Matrix{ComplexF64}} = [ones(ComplexF64,1,1) for _ in 1:N]
+    #matrices::Vector{Matrix{ComplexF64}} = [ones(ComplexF64,1,1) for _ in 1:N]
 
-    
+    out = 1
     perm(x) = permutedims(x, (1,3,5,2,4,6))
     for i in 1:N
         temp = contract(O[i], mps[i], 3, 2)  # Ol, Op, Or, ml, mr
         temp = contract(conj(mps[i]), temp, 2, 2)  # ml*, mr*, Ol, Or, ml, mr
-        temp = perm(temp)  # ml*, Ol, ml, mr*, Or, mr
+        #temp = perm(temp)  # ml*, Ol, ml, mr*, Or, mr
         #tensorcopy!(temp, TensorOperations.add_indices((1,2,3,4,5,6),(1,3,5,2,4,6)), copy(temp))
-        #temp = tensorcopy((1,3,5,2,4,6), temp, (1,2,3,4,5,6))
+        temp = tensorcopy((1,3,5,2,4,6), temp, (1,2,3,4,5,6))
         s_temp = size(temp)
-        matrices[i] = reshape(temp, (s_temp[1]*s_temp[2]*s_temp[3], s_temp[4]*s_temp[5]*s_temp[6]))
+        #matrices[i] = reshape(temp, (s_temp[1]*s_temp[2]*s_temp[3], s_temp[4]*s_temp[5]*s_temp[6]))
+        matrix = reshape(temp, (s_temp[1]*s_temp[2]*s_temp[3], s_temp[4]*s_temp[5]*s_temp[6]))
+        out = out * matrix
     end
 
-    """for i in 1:N
+    
+    """Threads.@threads for i in 1:N
+        A = zeros(ComplexF64, size(O[i],1), size(O[i],2), size(O[i],4), size(mps[i],1), size(mps[i],3))
         temp = zeros(ComplexF64, size(mps[i],1), size(O[i],1), size(mps[i],1), size(mps[i],3), size(O[i],4), size(mps[i],3))
-        @tensor begin
-            temp[ml_c, Ol, ml, mr_c, Or, mr] = conj(mps[i])[ml_c, p1, mr_c] * O[i][Ol, p1, p2, Or] * mps[i][ml, p2, mr]
-        end
+        
+        @tensor A[Ol, Op, Or, ml, mr] = O[i][Ol, Op, p2, Or] * mps[i][ml, p2, mr]
+        @tensor temp[ml_c, Ol, ml, mr_c, Or, mr] = conj(mps[i])[ml_c, p, mr_c] * A[Ol, p, Or, ml, mr]
+
+        #temp = zeros(ComplexF64, size(mps[i],1), size(O[i],1), size(mps[i],1), size(mps[i],3), size(O[i],4), size(mps[i],3))
+        #@tensor begin
+        #    temp[ml_c, Ol, ml, mr_c, Or, mr] = conj(mps[i])[ml_c, p1, mr_c] * O[i][Ol, p1, p2, Or] * mps[i][ml, p2, mr]
+        #end
         s_temp = size(temp)
         matrices[i] = reshape(temp, (s_temp[1]*s_temp[2]*s_temp[3], s_temp[4]*s_temp[5]*s_temp[6]))
     end"""
+    
 
     """out = 1.0
     for i in 1:N
         out = out * matrices[i]
     end"""
-    out = prod(matrices)
+    #out = prod(matrices)
 
 
     return out[1]  # return as number instead of zero dimensional array
