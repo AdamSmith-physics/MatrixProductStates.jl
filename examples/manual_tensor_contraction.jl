@@ -2,6 +2,7 @@ using Revise
 using BenchmarkTools
 using TensorOperations
 using LoopVectorization
+using Tullio
 
 # create a random rank 3 complex tensor
 L = 100
@@ -14,6 +15,10 @@ C = zeros(ComplexF64, L, L, L, L);
 function contract(A, B, C)
     @tensor C[i, j, k, l] = A[i, p, k] * B[j, p, l];
     return C
+end
+
+function contract_tullio(A,B,C)
+    @tullio C[i,j,k,l] := A[i,p,k] * B[j,p,l]
 end
 
 function contract_explicit(A,B,C)
@@ -51,6 +56,8 @@ end
 
 # contract the tensors
 @benchmark contract($A, $B, $C)
+
+@benchmark contract_tullio($A, $B, $C)
 
 @benchmark contract_explicit($A, $B, $C)
 
