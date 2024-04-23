@@ -1,8 +1,8 @@
 using Revise
 using BenchmarkTools
 using TensorOperations
-using LoopVectorization
-using Tullio
+using LoopVectorization  # removed...
+using Tullio # removed...
 
 # create a random rank 3 complex tensor
 L = 100

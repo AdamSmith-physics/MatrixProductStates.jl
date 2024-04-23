@@ -3,7 +3,6 @@ using TestItems
 using MatrixProductStates
 using BenchmarkTools
 using LinearAlgebra
-using Strided
 
 @testitem "Test TFIM MPO" begin
 
@@ -80,4 +79,6 @@ Threads.nthreads()
 
 @benchmark energy_TFIM2(psi, J, g, h)
 
+BLAS.set_num_threads(10)
 @benchmark expectation(psi, H)
+BLAS.get_num_threads()
