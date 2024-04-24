@@ -1,6 +1,7 @@
 
 export MPS
 export randomMPS
+export vector2MPS
 
 mutable struct MPS <: AbstractMPS
     d::Int  # physical dimension
@@ -40,6 +41,34 @@ function randomMPS(N::Int, d::Int, chi::Int, chiMax::Int, threshold::Float64)
     tensors[1] = randn(ComplexF64, 1, d, chi)
     tensors[end] = randn(ComplexF64, chi, d, 1)
     MPS(d, N, tensors, 1, chiMax, threshold)
+end
+
+"""
+Initialise an MPS from a state vector psi.
+"""
+function vector2MPS(psi::Vector{ComplexF64}, d::Int, chiMax::Int, threshold::Float64; normalised::Bool=true)
+    N = Int(log2(length(psi))/log2(d))
+
+    tensors = []
+    chi_old = 1
+    phi = copy(psi)
+
+    for _ in 1:N-1
+
+        phi = reshape(phi, (chi_old*d, :))
+
+        U, S, phi = svd_truncated(phi, chiMax, threshold; normalised=normalised)
+        chi_new = length(S)
+        phi = S .* phi
+        
+        append!(tensors, [reshape(U, chi_old, d, chi_new)])
+
+        chi_old = chi_new
+    end
+
+    append!(tensors, [reshape(phi, (chi_old, d, 1))])
+
+    MPS(d, N, tensors, N, chiMax, threshold)
 end
 
 
