@@ -1,6 +1,7 @@
 
 export MPS
 export randomMPS
+export vector2MPS
 
 mutable struct MPS <: AbstractMPS
     d::Int  # physical dimension
@@ -42,6 +43,34 @@ function randomMPS(N::Int, d::Int, chi::Int, chiMax::Int, threshold::Float64)
     MPS(d, N, tensors, 1, chiMax, threshold)
 end
 
+"""
+Initialise an MPS from a state vector psi.
+"""
+function vector2MPS(psi::Vector{ComplexF64}, d::Int, chiMax::Int, threshold::Float64; normalised::Bool=true)
+    N = Int(log2(length(psi))/log2(d))
+
+    tensors = []
+    chi_old = 1
+    phi = copy(psi)
+
+    for _ in 1:N-1
+
+        phi = reshape(phi, (chi_old*d, :))
+
+        U, S, phi = svd_truncated(phi, chiMax, threshold; normalised=normalised)
+        chi_new = length(S)
+        phi = S .* phi
+
+        append!(tensors, [reshape(U, chi_old, d, chi_new)])
+
+        chi_old = chi_new
+    end
+
+    append!(tensors, [reshape(phi, (chi_old, d, 1))])
+
+    MPS(d, N, tensors, N, chiMax, threshold)
+end
+
 
 export flatten
 """
@@ -52,7 +81,7 @@ function flatten(mps::MPS)
     # contract the MPS into a single tensor
     tensor = ones(ComplexF64, 1, 1)
     for i in 1:mps.N
-        tensor = contract(tensor, mps.tensors[i], 2, 1)  # p1, p2, vr
+        @tensor tensor[p1,p2,vr] := tensor[p1, c] * mps.tensors[i][c, p2, vr]
         tensor = reshape(tensor, size(tensor, 1)*size(tensor, 2), size(tensor, 3))  # (p1*p2), vr
     end
 

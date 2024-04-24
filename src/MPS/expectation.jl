@@ -7,11 +7,16 @@ function expectation_1site(mps::MPS, O::Array{<:Number,2}, site::Int)
     end
     movecentre!(mps, site)
     C = mps.tensors[site]  # vl, p, vr
+    
+    """
+    # old manual contraction
     out = contract(O, C, 2, 2)  # p, vl, vr
     #out = contract(conj(C), out, 2, 1)  # vl*, vr*, vl, vr
-    out = contract(conj(C), out, [1,2,3], [2,1,3])
+    out = contract(conj(C), out, [1,2,3], [2,1,3])"""
 
-    return out[1]  # return as number instead of zero dimensional array
+    @tensor out = conj(C)[vl, p1, vr] * O[p1, p2] * C[vl, p2, vr]
+
+    return out 
 end
 
 
@@ -30,15 +35,21 @@ function expectation_2site(mps::MPS, O::Array{<:Number,2}, site::Int)
         movecentre!(mps, site+1)
     end
 
+    """
+    # old manual contraction
     A = mps.tensors[site]  # vl, p, vr
     B = mps.tensors[site+1]  # vl, p, vr
     C = contract(A, B, 3, 1)  # vl, p, p, vr
     C = reshape(C, (size(C,1), size(C,2)*size(C,3), size(C,4)))  # vl, p*p, vr
     out = contract(O, C, 2, 2)  # p, vl, vr
     #out = contract(conj(C), out, 2, 1)  # vl*, vr*, vl, vr
-    out = contract(conj(C), out, [1,2,3], [2,1,3])
+    out = contract(conj(C), out, [1,2,3], [2,1,3])"""
 
-    return out[1]  # return as number instead of zero dimensional array
+    @tensor theta[vl, pl, pr, vr] := mps.tensors[site][vl, pl, c] * mps.tensors[site+1][c, pr, vr]
+    theta = reshape(theta, (size(theta,1),size(theta,2)*size(theta,3),size(theta,4)))  # vl, pl*pr, vr
+    @tensor out = conj(theta)[vl, p1, vr] * O[p1, p2] * theta[vl, p2, vr]
+
+    return out  # return as number instead of zero dimensional array
 end
 
 export expectation
