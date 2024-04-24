@@ -60,7 +60,7 @@ function vector2MPS(psi::Vector{ComplexF64}, d::Int, chiMax::Int, threshold::Flo
         U, S, phi = svd_truncated(phi, chiMax, threshold; normalised=normalised)
         chi_new = length(S)
         phi = S .* phi
-        
+
         append!(tensors, [reshape(U, chi_old, d, chi_new)])
 
         chi_old = chi_new
@@ -81,7 +81,7 @@ function flatten(mps::MPS)
     # contract the MPS into a single tensor
     tensor = ones(ComplexF64, 1, 1)
     for i in 1:mps.N
-        tensor = contract(tensor, mps.tensors[i], 2, 1)  # p1, p2, vr
+        @tensor tensor[p1,p2,vr] := tensor[p1, c] * mps.tensors[i][c, p2, vr]
         tensor = reshape(tensor, size(tensor, 1)*size(tensor, 2), size(tensor, 3))  # (p1*p2), vr
     end
 
