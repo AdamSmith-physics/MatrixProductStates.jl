@@ -19,6 +19,7 @@ include("MPS/overlap.jl")
 include("MPS/expectation.jl")
 include("MPS/apply.jl")
 include("MPS/truncate.jl")
+include("MPS/invert.jl")
 
 end # module MatrixProductStates
 ``
