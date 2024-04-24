@@ -6,7 +6,7 @@ function apply_1site!(mps::MPS, O::Array{<:Number,2}, site::Int)
     end
     movecentre!(mps, site)
 
-    @tensor mps.tensors[site][vl, p, vr] = O[p, pc] * mps.tensors[site][vl, pc, vr]
+    @tensor mps.tensors[site][vl, p, vr] := O[p, pc] * mps.tensors[site][vl, pc, vr]
 end
 
 
@@ -28,7 +28,7 @@ function apply_2site!(mps::MPS, O::Array{<:Number,2}, site::Int; normalised::Boo
     O_copy = reshape(copy(O), (2,2,2,2))  # por, pol, pir, pio  (flipped!)
 
     @tensor theta[vl, pl, pr, vr] := mps.tensors[site][vl, pl, c] * mps.tensors[site+1][c, pr, vr]
-    @tensor theta[vl, pl, pr, vr] = O_copy[pr, pl, cr, cl] * theta[vl, cl, cr, vr]  # flip left and right for contraction!
+    @tensor theta[vl, pl, pr, vr] := O_copy[pr, pl, cr, cl] * theta[vl, cl, cr, vr]  # flip left and right for contraction!
     vl = size(theta,1)
     vr = size(theta,4)
     theta = reshape(theta, (vl*mps.d, mps.d*vr))

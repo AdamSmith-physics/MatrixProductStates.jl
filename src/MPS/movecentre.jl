@@ -5,8 +5,8 @@ function moveright!(mps::MPS; normalised::Bool=false)
         A, S, B = svd_tensor(mps.tensors[mps.centre], 3; normalised=normalised)  # exact SVD
 
         mps.tensors[mps.centre] = A
-        B = Diagonal(S) * B
-        mps.tensors[mps.centre+1] = contract(B, mps.tensors[mps.centre+1], 2, 1)
+        B = S .* B
+        @tensor mps.tensors[mps.centre+1][vl, p, vr] := B[vl, c] * mps.tensors[mps.centre+1][c, p, vr]
         mps.centre += 1
     end
 end
@@ -16,8 +16,8 @@ function moveleft!(mps::MPS; normalised::Bool=false)
         A, S, B = svd_tensor(mps.tensors[mps.centre], 1; normalised=normalised)  # exact SVD
 
         mps.tensors[mps.centre] = B
-        A = A * Diagonal(S)
-        mps.tensors[mps.centre-1] = contract(mps.tensors[mps.centre-1], A, 3, 1)
+        A = A .* S'
+        @tensor mps.tensors[mps.centre-1][vl, p, vr] := mps.tensors[mps.centre-1][vl, p, c] * A[c, vr]
         mps.centre -= 1
     end
 end
