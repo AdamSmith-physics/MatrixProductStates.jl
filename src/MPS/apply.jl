@@ -34,7 +34,13 @@ function apply_2site!(mps::MPS, O::Array{<:Number,2}, site::Int; normalised::Boo
     theta = reshape(theta, (vl*mps.d, mps.d*vr))
 
     A, S, B = svd_truncated(theta, mps.chiMax, mps.threshold; normalised=normalised)
-    A = A * diagm(S)
+    if mps.centre == site
+        A = A * diagm(S)
+    elseif mps.centre == site+1
+        B = diagm(S) * B
+    else
+        throw(ArgumentError("Centre site not updated correctly."))
+    end
 
     mps.tensors[site] = reshape(A, (vl,mps.d,size(A,2)))
     mps.tensors[site+1] = reshape(B, (size(B,1),mps.d,vr))
