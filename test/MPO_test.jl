@@ -57,8 +57,65 @@ using LinearAlgebra
             @test to_matrix(H) ≈ H_mat
         end
     end
-
 end
+
+@testitem "Test XXZ MPO" begin
+
+    using LinearAlgebra
+
+    function XXZ_matrix(N::Int, J::Real, Delta::Real)
+        X = [0 1; 1 0]
+        Y = [0 -im; im 0]
+        Z = [1 0; 0 -1]
+
+        H_mat = zeros(ComplexF64, 2^N, 2^N)
+
+        # XX term
+        for i in 1:N-1
+            X_term = Matrix(I, 2^(i-1), 2^(i-1))
+            X_term = kron(X_term, X)
+            X_term = kron(X_term, X)
+            X_term = kron(X_term, Matrix(I,2^(N-i-1), 2^(N-i-1)))
+            H_mat += J * X_term
+        end
+
+        # YY term
+        for i in 1:N-1
+            Y_term = Matrix(I, 2^(i-1), 2^(i-1))
+            Y_term = kron(Y_term, Y)
+            Y_term = kron(Y_term, Y)
+            Y_term = kron(Y_term, Matrix(I,2^(N-i-1), 2^(N-i-1)))
+            H_mat += J * Y_term
+        end
+
+        # ZZ term
+        for i in 1:N-1
+            Z_term = Matrix(I, 2^(i-1), 2^(i-1))
+            Z_term = kron(Z_term, Z)
+            Z_term = kron(Z_term, Z)
+            Z_term = kron(Z_term, Matrix(I,2^(N-i-1), 2^(N-i-1)))
+            H_mat += J*Delta * Z_term
+        end
+
+        return H_mat
+    end
+
+    for N in 1:6
+        for _ in 1:10
+            J = rand()
+            Delta = rand()
+
+            H = XXZ(N, J, Delta);
+
+            # exact matrix to compare to
+            H_mat = XXZ_matrix(N, J, Delta);
+
+            @test to_matrix(H) ≈ H_mat
+        end
+    end
+end
+
+
 
 N = 20
 J = rand()
