@@ -74,5 +74,5 @@ end
 
 
 ### Creating copies
-Base.copy(O::AbstractMPO) = typeof(O)(rank(O), dim(O), tensors(O))
-Base.deepcopy(O::AbstractMPO) = typeof(O)(copy(rank(O)), copy(dim(O)), copy(tensors(O)))
+Base.copy(O::AbstractMPO) = typeof(O)(O.d, O.N, tensors(O))
+Base.deepcopy(O::AbstractMPO) = typeof(O)(copy(O.d), copy(O.N), copy(tensors(O)))

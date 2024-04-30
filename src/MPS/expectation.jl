@@ -112,7 +112,7 @@ export energy_TFIM2
 function energy_TFIM2(mps::MPS, J::Real, g::Real, h::Real)
     """
     Calculate the energy of the transverse field Ising model with nearest neighbour coupling J and transverse field h.
-    H = J * sum_i (Z_i Z_{i+1}) + h * sum_i Z_i + g * sum_i X_i
+    H = -J * (sum_i (Z_i Z_{i+1}) + h * sum_i Z_i + g * sum_i X_i)
     """
     N = length(mps)
     X = [0 1; 1 0]
@@ -121,20 +121,20 @@ function energy_TFIM2(mps::MPS, J::Real, g::Real, h::Real)
 
     H_local = zeros(ComplexF64, 4, 4)
 
-    H_local += J * kron(Z,Z)
-    H_local += h/2 * kron(Z, id) + h/2 * kron(id, Z)  # need to add extra at the ends
-    H_local += g/2 * kron(X, id) + g/2 * kron(id, X)  # need to add extra at the ends
+    H_local += -J * kron(Z,Z)
+    H_local += -J*(h/2 * kron(Z, id) + h/2 * kron(id, Z))  # need to add extra at the ends
+    H_local += -J*(g/2 * kron(X, id) + g/2 * kron(id, X))  # need to add extra at the ends
 
     E = 0.0
     for i in 1:N-1
         E += expectation_2site(mps, H_local, i)
     end
 
-    E += h/2 * expectation_1site(mps, Z, 1)  # extra at the ends
-    E += h/2 * expectation_1site(mps, Z, N)
+    E += -J*h/2 * expectation_1site(mps, Z, 1)  # extra at the ends
+    E += -J*h/2 * expectation_1site(mps, Z, N)
 
-    E += g/2 * expectation_1site(mps, X, 1)  # extra at the ends
-    E += g/2 * expectation_1site(mps, X, N)
+    E += -J*g/2 * expectation_1site(mps, X, 1)  # extra at the ends
+    E += -J*g/2 * expectation_1site(mps, X, N)
 
     return E
 

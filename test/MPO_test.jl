@@ -116,6 +116,62 @@ end
 end
 
 
+@testitem "Test QuantumEast MPO" begin
+
+    using LinearAlgebra
+
+    function QuantumEast_matrix(N::Int, s::Real, c::Real)
+        X = [0 1; 1 0]
+        n = [0 0; 0 1]
+
+        H_mat = zeros(ComplexF64, 2^N, 2^N)
+
+        # nX term  
+        for i in 1:N-1
+            X_term = Matrix(I, 2^(i-1), 2^(i-1))
+            X_term = kron(X_term, n)
+            X_term = kron(X_term, X)
+            X_term = kron(X_term, Matrix(I,2^(N-i-1), 2^(N-i-1)))
+            H_mat += -exp(-s)*sqrt(c*(1-c)) * X_term
+        end
+
+        # nn term
+        for i in 1:N-1
+            nn_term = Matrix(I, 2^(i-1), 2^(i-1))
+            nn_term = kron(nn_term, n)
+            nn_term = kron(nn_term, n)
+            nn_term = kron(nn_term, Matrix(I,2^(N-i-1), 2^(N-i-1)))
+            H_mat += (1-2*c) * nn_term
+        end
+
+        # n term
+        for i in 1:N
+            n_term = Matrix(I, 2^(i-1), 2^(i-1))
+            n_term = kron(n_term, n)
+            n_term = kron(n_term, Matrix(I,2^(N-i), 2^(N-i)))
+            H_mat += c * n_term
+        end
+
+        return H_mat
+    end
+
+    for N in 1:6
+        for _ in 1:10
+            s = rand()
+            c = rand()
+
+            H = QuantumEast(N, s, c);
+
+            # exact matrix to compare to
+            H_mat = QuantumEast_matrix(N, s, c);
+
+            invert!(H) ### Note that the terms are backwards due to column major!
+            @test to_matrix(H) ≈ H_mat
+        end
+    end
+end
+
+
 
 N = 20
 J = rand()

@@ -84,9 +84,9 @@ end
 
 
 ### Creating copies
-Base.copy(psi::AbstractMPS) = typeof(psi)(rank(psi), dim(psi), tensors(psi), center(psi))
-Base.deepcopy(psi::AbstractMPS) = typeof(psi)(copy(rank(psi)), copy(dim(psi)), copy(tensors(psi)),
-                                        copy(center(psi)))
+Base.copy(psi::AbstractMPS) = typeof(psi)(psi.d, psi.N, tensors(psi), centre(psi), psi.chiMax, psi.threshold)
+Base.deepcopy(psi::AbstractMPS) = typeof(psi)(copy(psi.d), copy(psi.N), copy(tensors(psi)), copy(centre(psi)),
+                                                copy(psi.chiMax), copy(psi.threshold))
 
 
 ### Products with numbers
