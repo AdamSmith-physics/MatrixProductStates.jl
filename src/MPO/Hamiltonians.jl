@@ -10,8 +10,8 @@ function TFIM(N::Int, J::Real, g::Real, h::Real)::MPO
     W = zeros(ComplexF64, 3, 2, 2, 3)
     W[1, :, :, 1] = Id
     W[1, :, :, 2] = Z
-    W[1, :, :, 3] = h*Z + g*X
-    W[2, :, :, 3] = J*Z
+    W[1, :, :, 3] = -J*(h*Z + g*X)
+    W[2, :, :, 3] = -J*Z
     W[3, :, :, 3] = Id
 
     for i in 1:N

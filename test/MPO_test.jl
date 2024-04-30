@@ -20,7 +20,7 @@ using LinearAlgebra
             Z_term = Matrix(I, 2^(i-1), 2^(i-1))
             Z_term = kron(Z_term, Z)
             Z_term = kron(Z_term, Matrix(I,2^(N-i), 2^(N-i)))
-            H_mat += h * Z_term
+            H_mat += -J*h * Z_term
         end
 
         # X terms
@@ -28,7 +28,7 @@ using LinearAlgebra
             X_term = Matrix(I, 2^(i-1), 2^(i-1))
             X_term = kron(X_term, X)
             X_term = kron(X_term, Matrix(I,2^(N-i), 2^(N-i)))
-            H_mat += g * X_term
+            H_mat += -J*g * X_term
         end
 
         # Z coupling
@@ -37,7 +37,7 @@ using LinearAlgebra
             Z_term = kron(Z_term, Z)
             Z_term = kron(Z_term, Z)
             Z_term = kron(Z_term, Matrix(I,2^(N-i-1), 2^(N-i-1)))
-            H_mat += J * Z_term
+            H_mat += -J * Z_term
         end
 
         return H_mat

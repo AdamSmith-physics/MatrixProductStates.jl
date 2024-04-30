@@ -20,12 +20,12 @@ CNOT_sp = SparseArray(CNOT)
 
 
 
-N = 20
+N = 10
 J = 1
 g = 1.4
 h = 0.9
 
-H_mpo = TFIM(N, -J, -g, -h)
+H_mpo = TFIM(N, J, g, h)
 
 H_full = to_matrix(H_mpo)
 @time H_sp = to_sparse(H_mpo)
