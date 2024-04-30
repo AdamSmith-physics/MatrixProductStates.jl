@@ -21,3 +21,20 @@ function invert(mps::MPS)
     invert!(mps_copy)
     return mps_copy
 end
+
+
+function invert!(mpo::MPO)
+    tensors = reverse(mpo.tensors)
+
+    for i in eachindex(tensors)
+        tensors[i] = permutedims(tensors[i], (4,2,3,1))
+    end
+
+    mpo.tensors = tensors
+end
+
+function invert(mpo::MPO)
+    mpo_copy = deepcopy(mpo)
+    invert!(mpo_copy)
+    return mpo_copy
+end
